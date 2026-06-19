@@ -1,0 +1,35 @@
+name: Build slides PDF
+
+on:
+  push:
+    branches: [main]
+    paths: [slides.md]
+  pull_request:
+    paths: [slides.md]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Japanese fonts
+        run: sudo apt-get install -y fonts-noto-cjk
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Marp CLI
+        run: npm install -g @marp-team/marp-cli
+
+      - name: Generate PDF
+        run: marp slides.md --pdf --allow-local-files -o slides.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides-pdf
+          path: slides.pdf
+          retention-days: 30
